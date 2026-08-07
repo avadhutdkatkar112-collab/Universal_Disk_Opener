@@ -184,7 +184,7 @@ async function openEvidence(imagePath: string) {
   _logAudit('evidence.open', imagePath, `Opening evidence file: ${fileName}`);
 
   try {
-    const partitions = await w.go.ui.StorageHandler.MountDisk(imagePath);
+    const partitions = await w.go.api.StorageHandler.MountDisk(imagePath);
     const format = detectFormat(fileName);
     const totalSize = partitions?.reduce((sum: number, p: any) => sum + (p.size || 0), 0) || 0;
 
@@ -230,8 +230,8 @@ async function selectPartition(index: number): Promise<boolean> {
   _logAudit('partition.select', `partition/${index}`, `Mounting filesystem on partition ${index}`);
 
   try {
-    await w.go.ui.StorageHandler.MountPartition(index);
-    const nodes = await w.go.ui.StorageHandler.ListDirectory('/');
+    await w.go.api.StorageHandler.MountPartition(index);
+    const nodes = await w.go.api.StorageHandler.ListDirectory('/');
     const artifacts = discoverArtifacts(nodes || []);
 
     const partition = _state.partitions.find((p: any) => p.index === index);
@@ -257,7 +257,7 @@ async function selectPartition(index: number): Promise<boolean> {
 async function navigateTo(path: string) {
   const w = window as any;
   try {
-    const nodes = await w.go.ui.StorageHandler.ListDirectory(path);
+    const nodes = await w.go.api.StorageHandler.ListDirectory(path);
     const newHistory = _state.pathHistory.slice(0, _state.historyIndex + 1);
     newHistory.push(path);
     _patch({
@@ -278,7 +278,7 @@ async function navigateBack() {
   const path = _state.pathHistory[newIndex];
   const w = window as any;
   try {
-    const nodes = await w.go.ui.StorageHandler.ListDirectory(path);
+    const nodes = await w.go.api.StorageHandler.ListDirectory(path);
     _patch({ currentNodes: nodes || [], currentPath: path, historyIndex: newIndex });
   } catch {}
 }
@@ -289,7 +289,7 @@ async function navigateForward() {
   const path = _state.pathHistory[newIndex];
   const w = window as any;
   try {
-    const nodes = await w.go.ui.StorageHandler.ListDirectory(path);
+    const nodes = await w.go.api.StorageHandler.ListDirectory(path);
     _patch({ currentNodes: nodes || [], currentPath: path, historyIndex: newIndex });
   } catch {}
 }

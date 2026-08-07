@@ -38,7 +38,7 @@ export const InvestigateView: React.FC = () => {
 
     for (const artifact of windowsPaths) {
       try {
-        const nodes = await w.go.ui.StorageHandler.ListDirectory(artifact.searchPath);
+        const nodes = await w.go.api.StorageHandler.ListDirectory(artifact.searchPath);
         if (nodes && nodes.length > 0) {
           discovered.push({
             name: artifact.name,
