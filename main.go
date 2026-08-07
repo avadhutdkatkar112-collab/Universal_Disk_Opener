@@ -7,10 +7,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/user/vhd-opener/internal/bridge"
-	"github.com/user/vhd-opener/internal/capabilities/search"
-	"github.com/user/vhd-opener/internal/platform"
-	"github.com/user/vhd-opener/internal/ui"
+	appservices "github.com/user/vhd-opener/internal/app/services"
+	"github.com/user/vhd-opener/internal/api"
+	"github.com/user/vhd-opener/internal/forensic/search"
+	"github.com/user/vhd-opener/internal/jobs"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
@@ -28,18 +28,19 @@ func main() {
 	appDir := filepath.Join(appData, "VHD-Explorer")
 	os.MkdirAll(appDir, 0755)
 
-	eventBus := platform.NewEventBus()
-	jobManager := platform.NewJobManager(eventBus)
-	gateway := platform.NewGateway(eventBus, jobManager)
-	workspaceManager := platform.NewWorkspaceManager(eventBus)
+	eventBus := appservices.NewEventBus()
+	jobManager := appservices.NewJobManager(eventBus)
+	gateway := appservices.NewGateway(eventBus, jobManager)
+	workspaceManager := appservices.NewWorkspace(appDir)
 
 	gateway.RegisterCapability(search.NewVFSSearchCapability())
+	_ = jobs.HashJobManager{}
 	log.Println("[Kernel] Registered: cap.disk.search")
 
-	wailsBridge := bridge.NewWailsBridge(gateway, eventBus, jobManager, workspaceManager)
-	legacyApp := ui.NewApp()
-	storageHandler := ui.NewStorageHandler()
-	sessionHandler := ui.NewSessionHandler()
+	wailsBridge := api.NewWailsBridge(gateway, eventBus, jobManager, workspaceManager)
+	legacyApp := api.NewApp()
+	storageHandler := api.NewStorageHandler()
+	sessionHandler := api.NewSessionHandler()
 
 	err = wails.Run(&options.App{
 		Title:     "Universal Disk Platform",

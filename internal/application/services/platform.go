@@ -14,24 +14,24 @@ import (
 	"sync"
 	"time"
 
-	"github.com/user/vhd-opener/internal/domain/disk"
-	"github.com/user/vhd-opener/internal/domain/vfs"
+	"github.com/user/vhd-opener/internal/storage"
+	"github.com/user/vhd-opener/internal/vfs"
 	"github.com/user/vhd-opener/internal/infrastructure/cache"
 	"github.com/user/vhd-opener/internal/infrastructure/events"
-	_ "github.com/user/vhd-opener/internal/domain/vhd"
-	_ "github.com/user/vhd-opener/internal/domain/vhdx"
-	_ "github.com/user/vhd-opener/internal/domain/vmdk"
-	_ "github.com/user/vhd-opener/internal/domain/qcow2"
-	_ "github.com/user/vhd-opener/internal/domain/raw"
-	_ "github.com/user/vhd-opener/internal/domain/vdi"
+	_ "github.com/user/vhd-opener/internal/storage/containers/vhd"
+	_ "github.com/user/vhd-opener/internal/storage/containers/vhdx"
+	_ "github.com/user/vhd-opener/internal/storage/containers/vmdk"
+	_ "github.com/user/vhd-opener/internal/storage/containers/qcow2"
+	_ "github.com/user/vhd-opener/internal/storage/containers/raw"
+	_ "github.com/user/vhd-opener/internal/storage/containers/vdi"
 )
 
 // Platform is the main application platform.
 type Platform struct {
 	bus       *events.Bus
 	cache     *cache.MultiLevelCache
-	disk      disk.VirtualDisk
-	result    *disk.OpenResult
+	disk      storage.VirtualDisk
+	result    *storage.OpenResult
 	filesystem vfs.VirtualFS
 	activePart int
 	mu        sync.RWMutex
@@ -46,7 +46,7 @@ func NewPlatform() *Platform {
 }
 
 // Open opens a disk file.
-func (p *Platform) Open(path string) (*disk.OpenResult, error) {
+func (p *Platform) Open(path string) (*storage.OpenResult, error) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
@@ -57,7 +57,7 @@ func (p *Platform) Open(path string) (*disk.OpenResult, error) {
 		p.filesystem = nil
 	}
 
-	result, err := disk.NewSmartOpen().Open(path)
+	result, err := storage.NewSmartOpen().Open(path)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func (p *Platform) initVFS(partitionIndex int) {
 }
 
 // OpenWithPartition opens a disk and selects a specific partition.
-func (p *Platform) OpenWithPartition(path string, index int) (*disk.OpenResult, error) {
+func (p *Platform) OpenWithPartition(path string, index int) (*storage.OpenResult, error) {
 	result, err := p.Open(path)
 	if err != nil {
 		return nil, err
@@ -165,7 +165,7 @@ func (p *Platform) ReadFile(path string) (io.ReadCloser, error) {
 }
 
 // GetDiskInfo returns disk information.
-func (p *Platform) GetDiskInfo() *disk.DiskInfo {
+func (p *Platform) GetDiskInfo() *storage.DiskInfo {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 	if p.disk == nil {
@@ -176,13 +176,13 @@ func (p *Platform) GetDiskInfo() *disk.DiskInfo {
 }
 
 // GetDetailedDiskInfo returns the full forensic-grade disk info (4-card panel).
-func (p *Platform) GetDetailedDiskInfo() *disk.DiskInfoResponse {
+func (p *Platform) GetDetailedDiskInfo() *storage.DiskInfoResponse {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 	if p.disk == nil || p.result == nil {
 		return nil
 	}
-	resp := disk.CollectDiskInfo(p.disk, p.result)
+	resp := storage.CollectDiskInfo(p.disk, p.result)
 	return &resp
 }
 
@@ -196,7 +196,7 @@ func (p *Platform) GetDiskHash() (md5Hex, sha256Hex string, err error) {
 
 	// Compute MD5
 	var md5Buf bytes.Buffer
-	if err := disk.ReadForHash(p.disk, &md5Buf); err != nil {
+	if err := storage.ReadForHash(p.disk, &md5Buf); err != nil {
 		return "", "", fmt.Errorf("md5 read failed: %w", err)
 	}
 	md5Hash := md5.Sum(md5Buf.Bytes())
@@ -204,7 +204,7 @@ func (p *Platform) GetDiskHash() (md5Hex, sha256Hex string, err error) {
 
 	// Re-read for SHA-256 (we can't tee without buffering)
 	var sha256Buf bytes.Buffer
-	if err := disk.ReadForHash(p.disk, &sha256Buf); err != nil {
+	if err := storage.ReadForHash(p.disk, &sha256Buf); err != nil {
 		return md5Hex, "", fmt.Errorf("sha256 read failed: %w", err)
 	}
 	sha256Hash := sha256.Sum256(sha256Buf.Bytes())
@@ -214,7 +214,7 @@ func (p *Platform) GetDiskHash() (md5Hex, sha256Hex string, err error) {
 }
 
 // GetPartitions returns partitions.
-func (p *Platform) GetPartitions() []disk.Partition {
+func (p *Platform) GetPartitions() []storage.Partition {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 	if p.result == nil {
@@ -224,7 +224,7 @@ func (p *Platform) GetPartitions() []disk.Partition {
 }
 
 // GetOpenResult returns the open result.
-func (p *Platform) GetOpenResult() *disk.OpenResult {
+func (p *Platform) GetOpenResult() *storage.OpenResult {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 	return p.result
@@ -239,7 +239,7 @@ func (p *Platform) PartitionHash(partitionIndex int) (map[string]interface{}, er
 		return nil, fmt.Errorf("no disk open")
 	}
 
-	var part *disk.Partition
+	var part *storage.Partition
 	for i := range p.result.Partitions {
 		if p.result.Partitions[i].Index == partitionIndex {
 			part = &p.result.Partitions[i]
@@ -305,7 +305,7 @@ func (p *Platform) PartitionHashStream(partitionIndex int, progressChan chan<- i
 		return nil, fmt.Errorf("no disk open")
 	}
 
-	var part *disk.Partition
+	var part *storage.Partition
 	for i := range p.result.Partitions {
 		if p.result.Partitions[i].Index == partitionIndex {
 			part = &p.result.Partitions[i]
