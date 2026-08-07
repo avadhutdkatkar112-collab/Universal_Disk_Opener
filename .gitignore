@@ -8,6 +8,18 @@
 # Build output
 build/bin/
 bin/
+dist/
+
+# Test files
+*_test.go
+test/
+tests/
+cmd/ext4test/
+cmd/sigma_test_runner/
+*.test
+*.out
+*.prof
+*.pprof
 
 # Test disk images
 *.dd
@@ -23,11 +35,10 @@ bin/
 # Wails temp
 frontend/dist/
 frontend/dist-ssr/
+frontend/package.json.md5
 
 # Go
-*.test
-*.out
-*.prof
+vendor/
 
 # Node
 frontend/node_modules/
@@ -51,3 +62,7 @@ Desktop.ini
 .env
 .env.local
 .env.*.local
+
+# Misc
+OPENCODE.md
+PROJECT_DOCUMENTATION.md
