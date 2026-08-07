@@ -1,0 +1,53 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Build output
+build/bin/
+bin/
+
+# Test disk images
+*.dd
+*.vmdk
+*.qcow2
+*.qcow
+*.vhd
+*.vhdx
+*.vdi
+*.img
+*.raw
+
+# Wails temp
+frontend/dist/
+frontend/dist-ssr/
+
+# Go
+*.test
+*.out
+*.prof
+
+# Node
+frontend/node_modules/
+.pnp
+.pnp.js
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Env
+.env
+.env.local
+.env.*.local

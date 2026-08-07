@@ -1,0 +1,34 @@
+:root {
+  /* Windows 11 Fluent Design — Light Theme */
+  --win-bg: #F3F3F3;
+  --win-surface: #FFFFFF;
+  --win-elevated: #FAFAFA;
+  --win-card: #FFFFFF;
+  --win-stroke: rgba(0, 0, 0, 0.06);
+  --win-stroke-strong: rgba(0, 0, 0, 0.10);
+  --win-text: #1A1A1A;
+  --win-text-secondary: #616161;
+  --win-text-tertiary: #8A8A8A;
+  --win-text-disabled: #BDBDBD;
+  --win-accent: #0078D4;
+  --win-accent-default: #0078D4;
+  --win-accent-dark: #005A9E;
+  --win-accent-light: #E8F4FD;
+  --win-success: #0F7B0F;
+  --win-warning: #9D5D00;
+  --win-danger: #C42B1C;
+  --win-control: #F5F5F5;
+  --win-control-hover: #EBEBEB;
+  --win-control-pressed: #E0E0E0;
+  --win-subtle: rgba(0, 0, 0, 0.03);
+  --win-subtle-hover: rgba(0, 0, 0, 0.05);
+  --win-subtle-pressed: rgba(0, 0, 0, 0.02);
+  --win-mica: rgba(243, 243, 243, 0.85);
+  --win-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  --win-shadow-flyout: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+  --win-radius: 8px;
+  --win-radius-sm: 4px;
+  --win-radius-lg: 12px;
+  --win-font: 'Segoe UI Variable', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --win-font-mono: 'Cascadia Code', 'Consolas', monospace;
+}

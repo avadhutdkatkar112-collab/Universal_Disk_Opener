@@ -1,0 +1,21 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "vhd-opener",
+  "outputfilename": "vhd-opener",
+  "frontend:dir": "frontend",
+  "frontend:build": "npm run build",
+  "frontend:install": "npm install",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "author": {
+    "name": "VHD Opener",
+    "email": ""
+  },
+  "info": {
+    "companyName": "VHD Opener",
+    "productName": "VHD Opener",
+    "productVersion": "1.0.0",
+    "copyright": "Copyright © 2026 VHD Opener",
+    "comments": "A professional VHD file reader and browser"
+  }
+}
